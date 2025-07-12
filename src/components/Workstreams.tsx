@@ -4,6 +4,7 @@ import { useProjects } from '../hooks/useProjects';
 import { useIconTheme } from '../contexts/IconThemeContext';
 import { formatDate, getPriorityColor } from '../utils/data';
 import TaskEditModal from './TaskEditModal';
+import IconButton from './ui/IconButton';
 
 const Workstreams: React.FC = () => {
   const { workstreams, loading, createWorkstream, deleteWorkstream, moveTask, createTask, reorderWorkstreams, toggleTaskStarred, updateWorkstreamTask, deleteWorkstreamTask } = useWorkstreams();
@@ -359,6 +360,7 @@ const Workstreams: React.FC = () => {
                                     toggleTaskStarred(task.id);
                                   }}
                                   className="flex-shrink-0 mt-0.5"
+                                  aria-label={task.starred ? "Remove from priority" : "Mark as priority"}
                                 >
                                   <icons.starred className={`w-4 h-4 ${
                                     task.starred 
@@ -388,8 +390,14 @@ const Workstreams: React.FC = () => {
                                     setEditingTask(task.id);
                                   }}
                                   className="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                                  aria-label="Edit task"
                                 >
-                                  <icons.edit className="w-4 h-4" />
+                                  <IconButton
+                                    variant="edit"
+                                    onClick={() => setEditingTask(task.id)}
+                                    aria-label="Edit task"
+                                    size="sm"
+                                  />
                                 </button>
                               </div>
                             </div>

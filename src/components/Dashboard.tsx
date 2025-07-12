@@ -4,6 +4,7 @@ import { useProjects } from '../hooks/useProjects';
 import { useIconTheme } from '../contexts/IconThemeContext';
 import { getProgressPercentage, formatDate, getPriorityColor } from '../utils/data';
 import TaskEditModal from './TaskEditModal';
+import IconButton from './ui/IconButton';
 
 const Dashboard: React.FC = () => {
   const { tasks } = useTasks();
@@ -144,8 +145,14 @@ const Dashboard: React.FC = () => {
                       <button
                         onClick={() => setEditingTask(task.id)}
                         className="text-gray-400 hover:text-blue-600 transition-colors"
+                        aria-label="Edit task"
                       >
-                        <icons.edit className="w-3 h-3" />
+                        <IconButton
+                          variant="edit"
+                          onClick={() => setEditingTask(task.id)}
+                          aria-label="Edit task"
+                          size="sm"
+                        />
                       </button>
                     </div>
                   </div>

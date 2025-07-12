@@ -4,6 +4,7 @@ import { useLists } from '../hooks/useLists';
 import { useIconTheme } from '../contexts/IconThemeContext';
 import { formatDate, getPriorityColor } from '../utils/data';
 import TaskEditModal from './TaskEditModal';
+import IconButton from './ui/IconButton';
 
 const Tasks: React.FC = () => {
   const { tasks, loading, createTask, updateTask, deleteTask, toggleTask, toggleStarred } = useTasks();
@@ -346,17 +347,20 @@ const Tasks: React.FC = () => {
                 <button
                   onClick={() => toggleTask(task.id)}
                   className="flex-shrink-0"
+                  aria-label={task.completed ? "Mark as incomplete" : "Mark as complete"}
                 >
-                  {task.completed ? (
-                    <icons.completed className="w-6 h-6 text-green-500" />
-                  ) : (
-                    <icons.pending className="w-6 h-6 text-gray-400 hover:text-blue-500" />
-                  )}
+                  <IconButton
+                    variant={task.completed ? "complete" : "incomplete"}
+                    onClick={() => toggleTask(task.id)}
+                    aria-label={task.completed ? "Mark as incomplete" : "Mark as complete"}
+                    size="md"
+                  />
                 </button>
                 
                 <button
                   onClick={() => toggleStarred(task.id)}
                   className="flex-shrink-0"
+                  aria-label={task.starred ? "Remove from priority" : "Mark as priority"}
                 >
                   <icons.starred className={`w-5 h-5 ${
                     task.starred 

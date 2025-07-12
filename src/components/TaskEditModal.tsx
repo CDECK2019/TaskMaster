@@ -3,6 +3,7 @@ import { Task } from '../types';
 import { useLists } from '../hooks/useLists';
 import { useIconTheme } from '../contexts/IconThemeContext';
 import { getPriorityColor } from '../utils/data';
+import IconButton from './ui/IconButton';
 
 interface TaskEditModalProps {
   task: Task;
@@ -99,8 +100,14 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({
               <button
                 onClick={onClose}
                 className="text-gray-400 hover:text-gray-600 transition-colors"
+                aria-label="Close modal"
               >
-                <icons.close className="w-6 h-6" />
+                <IconButton
+                  variant="delete"
+                  onClick={onClose}
+                  aria-label="Close modal"
+                  size="md"
+                />
               </button>
             </div>
           </div>

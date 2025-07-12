@@ -1,0 +1,118 @@
+/* Icon component styles */
+
+.icon-btn {
+  @apply p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700/50 
+         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+         dark:focus:ring-blue-400 dark:focus:ring-offset-gray-800
+         transition-colors duration-200 min-w-[44px] min-h-[44px] 
+         flex items-center justify-center group;
+}
+
+.icon-btn:disabled {
+  @apply opacity-50 cursor-not-allowed;
+}
+
+/* Icon size variants */
+.icon-sm {
+  @apply w-4 h-4;
+}
+
+.icon-md {
+  @apply w-5 h-5;
+}
+
+.icon-lg {
+  @apply w-6 h-6;
+}
+
+/* Icon color variants */
+.icon-primary {
+  @apply text-blue-600 dark:text-blue-400 transition-colors;
+}
+
+.icon-success {
+  @apply text-green-600 dark:text-green-400 transition-colors;
+}
+
+.icon-warning {
+  @apply text-yellow-600 dark:text-yellow-400 transition-colors;
+}
+
+.icon-danger {
+  @apply text-red-600 dark:text-red-400 transition-colors;
+}
+
+.icon-muted {
+  @apply text-gray-500 dark:text-gray-400 transition-colors;
+}
+
+/* Hover states */
+.icon-primary:hover {
+  @apply text-blue-700 dark:text-blue-300;
+}
+
+.icon-success:hover {
+  @apply text-green-700 dark:text-green-300;
+}
+
+.icon-warning:hover {
+  @apply text-yellow-700 dark:text-yellow-300;
+}
+
+.icon-danger:hover {
+  @apply text-red-700 dark:text-red-300;
+}
+
+.icon-muted:hover {
+  @apply text-gray-600 dark:text-gray-300;
+}
+
+/* Enhanced hover effects */
+.icon-hover-scale {
+  @apply transition-transform hover:scale-110;
+}
+
+.icon-hover-glow {
+  @apply transition-shadow hover:drop-shadow-lg;
+}
+
+/* Star animation */
+.star-animation {
+  animation: starPulse 0.6s ease-in-out;
+}
+
+@keyframes starPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+
+/* Animated checkmark */
+.checkmark-animation {
+  animation: checkmark 0.3s ease-in-out;
+}
+
+@keyframes checkmark {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Loading spinner for async actions */
+.icon-loading {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
