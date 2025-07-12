@@ -266,44 +266,41 @@ const Gantt: React.FC = () => {
 
   // Generate timeline header dates for display
   const timelineHeaderDates = useMemo(() => {
-    switch (viewMode) {
-      case 'day':
-        return timelineDates.map(date => ({
-          label: date.toLocaleDateString('en-US', { weekday: 'short' }),
-          sublabel: date.getDate().toString(),
-          date
-        }));
-      case 'week':
-        return timelineDates.filter((_, index) => index % 7 === 0).map(date => ({
-          label: `Week ${Math.ceil(date.getDate() / 7)}`,
-          sublabel: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-          date
-        }));
-      case 'month':
-        // Show every few days based on total range
-        const monthStep = Math.max(1, Math.floor(timelineDates.length / 10));
-        return timelineDates.filter((_, index) => index % monthStep === 0).map(date => ({
-          label: date.getDate().toString(),
-          sublabel: date.toLocaleDateString('en-US', { weekday: 'short' }),
-          date
-        }));
-      case 'quarter':
-        // Show weeks
-        return timelineDates.filter((_, index) => index % 7 === 0).map(date => ({
-          label: `Week ${Math.ceil(date.getDate() / 7)}`,
-          sublabel: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-          date
-        }));
-      case 'year':
-        // Show months
-        return timelineDates.filter((_, index) => index % 30 === 0).map(date => ({
-          label: date.toLocaleDateString('en-US', { month: 'short' }),
-          sublabel: date.getFullYear().toString(),
-          date
-        }));
-      default:
-        return [];
+    // Create a monthly calendar header regardless of view mode
+    const months = [];
+    const startDate = timelineDates[0];
+    const endDate = timelineDates[timelineDates.length - 1];
+    
+    if (!startDate || !endDate) return [];
+    
+    // Get all unique months in the date range
+    const currentDate = new Date(startDate);
+    currentDate.setDate(1); // Start from first day of month
+    
+    while (currentDate <= endDate) {
+      const monthStart = new Date(currentDate);
+      const monthEnd = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+      
+      // Calculate the position and width of this month in the timeline
+      const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+      const monthStartOffset = Math.max(0, Math.ceil((monthStart.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)));
+      const monthEndOffset = Math.min(totalDays, Math.ceil((monthEnd.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)));
+      
+      if (monthEndOffset > monthStartOffset) {
+        months.push({
+          label: monthStart.toLocaleDateString('en-US', { month: 'long' }),
+          year: monthStart.getFullYear(),
+          date: monthStart,
+          leftPercent: (monthStartOffset / totalDays) * 100,
+          widthPercent: ((monthEndOffset - monthStartOffset) / totalDays) * 100
+        });
+      }
+      
+      // Move to next month
+      currentDate.setMonth(currentDate.getMonth() + 1);
     }
+    
+    return months;
   }, [timelineDates, viewMode]);
 
   // Get today's position for the indicator line
@@ -494,20 +491,40 @@ const Gantt: React.FC = () => {
                       <h4 className="font-medium text-gray-900 dark:text-white">Task</h4>
                     </div>
                     <div className="flex-1 relative">
-                      {/* Date Headers */}
-                      <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mb-2">
-                        {timelineHeaderDates.map((dateInfo, index) => (
-                          <div key={index} className="text-center min-w-0 flex-1">
-                            <div className="font-medium">{dateInfo.label}</div>
-                            <div className="text-gray-400">{dateInfo.sublabel}</div>
+                      {/* Monthly Calendar Header */}
+                      <div className="relative h-12 mb-2 bg-gray-50 dark:bg-gray-700 rounded-lg overflow-hidden">
+                        {timelineHeaderDates.map((monthInfo, index) => (
+                          <div 
+                            key={index} 
+                            className="absolute top-0 bottom-0 border-r border-gray-200 dark:border-gray-600 last:border-r-0 flex items-center justify-center bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30"
+                            style={{
+                              left: `${monthInfo.leftPercent}%`,
+                              width: `${monthInfo.widthPercent}%`
+                            }}
+                          >
+                            <div className="text-center">
+                              <div className="font-semibold text-sm text-gray-800 dark:text-gray-200">
+                                {monthInfo.label}
+                              </div>
+                              <div className="text-xs text-gray-600 dark:text-gray-400">
+                                {monthInfo.year}
+                              </div>
+                            </div>
                           </div>
                         ))}
                       </div>
                       
-                      {/* Grid Lines */}
-                      <div className="absolute inset-0 flex">
-                        {timelineHeaderDates.map((_, index) => (
-                          <div key={index} className="flex-1 border-r border-gray-100 dark:border-gray-700 last:border-r-0"></div>
+                      {/* Month Grid Lines */}
+                      <div className="absolute top-12 bottom-0">
+                        {timelineHeaderDates.map((monthInfo, index) => (
+                          <div 
+                            key={index} 
+                            className="absolute top-0 bottom-0 border-r border-gray-100 dark:border-gray-700 last:border-r-0"
+                            style={{
+                              left: `${monthInfo.leftPercent}%`,
+                              width: `${monthInfo.widthPercent}%`
+                            }}
+                          ></div>
                         ))}
                       </div>
                       
@@ -567,10 +584,17 @@ const Gantt: React.FC = () => {
                             </div>
                             
                             <div className="flex-1 relative h-8">
-                              {/* Grid Lines for this row */}
-                              <div className="absolute inset-0 flex">
-                                {timelineHeaderDates.map((_, index) => (
-                                  <div key={index} className="flex-1 border-r border-gray-100 dark:border-gray-700 last:border-r-0"></div>
+                              {/* Month Grid Lines for this row */}
+                              <div className="absolute inset-0">
+                                {timelineHeaderDates.map((monthInfo, index) => (
+                                  <div 
+                                    key={index} 
+                                    className="absolute top-0 bottom-0 border-r border-gray-100 dark:border-gray-700 last:border-r-0"
+                                    style={{
+                                      left: `${monthInfo.leftPercent}%`,
+                                      width: `${monthInfo.widthPercent}%`
+                                    }}
+                                  ></div>
                                 ))}
                               </div>
                               
