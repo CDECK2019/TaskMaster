@@ -501,18 +501,20 @@ const Gantt: React.FC = () => {
                         {timelineHeaderDates.map((monthInfo, index) => (
                           <div 
                             key={index} 
-                            className="absolute top-0 bottom-0 border-r border-gray-200 dark:border-gray-600 last:border-r-0 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                            className="absolute top-0 bottom-0 border-r border-gray-200 dark:border-gray-600 last:border-r-0 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
                             style={{
                               left: `${monthInfo.leftPercent}%`,
                               width: `${monthInfo.widthPercent}%`
                             }}
                           >
-                            <div className="text-center">
-                              <div className="font-medium text-sm text-gray-700 dark:text-gray-300">
+                            <div className="absolute inset-0 flex items-center justify-center px-2">
+                              <div className="text-center min-w-0 flex-1">
+                                <div className="font-medium text-sm text-gray-700 dark:text-gray-300 truncate">
                                 {monthInfo.label}
-                              </div>
-                              <div className="text-xs text-gray-500 dark:text-gray-500">
+                                </div>
+                                <div className="text-xs text-gray-500 dark:text-gray-500 truncate">
                                 {monthInfo.year}
+                                </div>
                               </div>
                             </div>
                           </div>
