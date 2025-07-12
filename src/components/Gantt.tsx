@@ -266,33 +266,38 @@ const Gantt: React.FC = () => {
 
   // Generate timeline header dates for display
   const timelineHeaderDates = useMemo(() => {
-    // Create a monthly calendar header regardless of view mode
+    // Create a clean monthly calendar header
     const months = [];
     const startDate = timelineDates[0];
     const endDate = timelineDates[timelineDates.length - 1];
     
     if (!startDate || !endDate) return [];
     
-    // Get all unique months in the date range
+    // Get all unique months in the date range with proper boundaries
     const currentDate = new Date(startDate);
     currentDate.setDate(1); // Start from first day of month
     
     while (currentDate <= endDate) {
       const monthStart = new Date(currentDate);
-      const monthEnd = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+      const monthEnd = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0, 23, 59, 59);
       
       // Calculate the position and width of this month in the timeline
-      const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-      const monthStartOffset = Math.max(0, Math.ceil((monthStart.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)));
-      const monthEndOffset = Math.min(totalDays, Math.ceil((monthEnd.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)));
+      const totalDuration = endDate.getTime() - startDate.getTime();
       
-      if (monthEndOffset > monthStartOffset) {
+      // Calculate visible portion of this month
+      const visibleStart = Math.max(monthStart.getTime(), startDate.getTime());
+      const visibleEnd = Math.min(monthEnd.getTime(), endDate.getTime());
+      
+      if (visibleEnd > visibleStart) {
+        const leftPercent = ((visibleStart - startDate.getTime()) / totalDuration) * 100;
+        const widthPercent = ((visibleEnd - visibleStart) / totalDuration) * 100;
+      
         months.push({
           label: monthStart.toLocaleDateString('en-US', { month: 'long' }),
           year: monthStart.getFullYear(),
           date: monthStart,
-          leftPercent: (monthStartOffset / totalDays) * 100,
-          widthPercent: ((monthEndOffset - monthStartOffset) / totalDays) * 100
+          leftPercent: Math.max(0, leftPercent),
+          widthPercent: Math.min(100 - Math.max(0, leftPercent), widthPercent)
         });
       }
       
@@ -491,22 +496,22 @@ const Gantt: React.FC = () => {
                       <h4 className="font-medium text-gray-900 dark:text-white">Task</h4>
                     </div>
                     <div className="flex-1 relative">
-                      {/* Monthly Calendar Header */}
-                      <div className="relative h-12 mb-2 bg-gray-50 dark:bg-gray-700 rounded-lg overflow-hidden">
+                      {/* Clean Monthly Calendar Header */}
+                      <div className="relative h-12 mb-2 border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden bg-white dark:bg-gray-800">
                         {timelineHeaderDates.map((monthInfo, index) => (
                           <div 
                             key={index} 
-                            className="absolute top-0 bottom-0 border-r border-gray-200 dark:border-gray-600 last:border-r-0 flex items-center justify-center bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30"
+                            className="absolute top-0 bottom-0 border-r border-gray-200 dark:border-gray-600 last:border-r-0 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
                             style={{
                               left: `${monthInfo.leftPercent}%`,
                               width: `${monthInfo.widthPercent}%`
                             }}
                           >
                             <div className="text-center">
-                              <div className="font-semibold text-sm text-gray-800 dark:text-gray-200">
+                              <div className="font-medium text-sm text-gray-700 dark:text-gray-300">
                                 {monthInfo.label}
                               </div>
-                              <div className="text-xs text-gray-600 dark:text-gray-400">
+                              <div className="text-xs text-gray-500 dark:text-gray-500">
                                 {monthInfo.year}
                               </div>
                             </div>
@@ -514,12 +519,12 @@ const Gantt: React.FC = () => {
                         ))}
                       </div>
                       
-                      {/* Month Grid Lines */}
+                      {/* Subtle Month Grid Lines */}
                       <div className="absolute top-12 bottom-0">
                         {timelineHeaderDates.map((monthInfo, index) => (
                           <div 
                             key={index} 
-                            className="absolute top-0 bottom-0 border-r border-gray-100 dark:border-gray-700 last:border-r-0"
+                            className="absolute top-0 bottom-0 border-r border-gray-100 dark:border-gray-700/50 last:border-r-0"
                             style={{
                               left: `${monthInfo.leftPercent}%`,
                               width: `${monthInfo.widthPercent}%`
@@ -531,10 +536,10 @@ const Gantt: React.FC = () => {
                       {/* Today Indicator */}
                       {todayPosition !== null && (
                         <div
-                          className="absolute top-0 bottom-0 w-0.5 bg-red-500 z-10"
+                          className="absolute top-0 bottom-0 w-0.5 bg-red-500 dark:bg-red-400 z-10"
                           style={{ left: `${todayPosition}%` }}
                         >
-                          <div className="absolute -top-2 -left-6 bg-red-500 text-white text-xs px-2 py-1 rounded">
+                          <div className="absolute -top-2 -left-6 bg-red-500 dark:bg-red-400 text-white text-xs px-2 py-1 rounded shadow-sm">
                             Today
                           </div>
                         </div>
@@ -589,7 +594,7 @@ const Gantt: React.FC = () => {
                                 {timelineHeaderDates.map((monthInfo, index) => (
                                   <div 
                                     key={index} 
-                                    className="absolute top-0 bottom-0 border-r border-gray-100 dark:border-gray-700 last:border-r-0"
+                                    className="absolute top-0 bottom-0 border-r border-gray-100 dark:border-gray-700/30 last:border-r-0"
                                     style={{
                                       left: `${monthInfo.leftPercent}%`,
                                       width: `${monthInfo.widthPercent}%`
