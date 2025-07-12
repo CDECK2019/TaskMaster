@@ -293,7 +293,7 @@ const Gantt: React.FC = () => {
         const widthPercent = ((visibleEnd - visibleStart) / totalDuration) * 100;
       
         months.push({
-          label: monthStart.toLocaleDateString('en-US', { month: 'long' }),
+          label: monthStart.toLocaleDateString('en-US', { month: 'short' }),
           year: monthStart.getFullYear(),
           date: monthStart,
           leftPercent: Math.max(0, leftPercent),
