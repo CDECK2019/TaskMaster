@@ -18,8 +18,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, onViewChange }) => {
     { id: 'projects', label: 'Projects', icon: icons.projects },
     { id: 'tasks', label: 'All Tasks', icon: icons.tasks },
     { id: 'gantt', label: 'Timeline', icon: icons.timeline },
-    { id: 'workstreams', label: 'Workstreams', icon: icons.workstreams },
-    { id: 'settings', label: 'Settings', icon: icons.settings }
+    { id: 'workstreams', label: 'Workstreams', icon: icons.workstreams }
   ];
 
   return (
