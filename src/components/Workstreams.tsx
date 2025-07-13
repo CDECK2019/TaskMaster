@@ -10,6 +10,7 @@ const Workstreams: React.FC = () => {
   const { workstreams, loading, createWorkstream, deleteWorkstream, moveTask, createTask, reorderWorkstreams, toggleTaskStarred, updateWorkstreamTask, deleteWorkstreamTask } = useWorkstreams();
   const { projects } = useProjects();
   const { icons } = useIconTheme();
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [draggedTask, setDraggedTask] = useState<any>(null);
   const [draggedWorkstream, setDraggedWorkstream] = useState<string | null>(null);
   const [dragOverWorkstream, setDragOverWorkstream] = useState<string | null>(null);
@@ -24,6 +25,15 @@ const Workstreams: React.FC = () => {
     dueDate: '',
     tags: [] as string[]
   });
+
+  // Filter workstreams by selected project
+  const filteredWorkstreams = selectedProjectId 
+    ? workstreams.filter(w => w.projectId === selectedProjectId)
+    : workstreams;
+
+  const selectedProject = selectedProjectId 
+    ? projects.find(p => p.id === selectedProjectId)
+    : null;
 
   // Task drag handlers
   const handleTaskDragStart = (e: React.DragEvent, task: any, sourceColumnId: string) => {
@@ -179,15 +189,44 @@ const Workstreams: React.FC = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Workstreams</h1>
-          <p className="text-gray-600 dark:text-gray-300">Visual workflow management with drag-and-drop</p>
+          <p className="text-gray-600 dark:text-gray-300">
+            Visual workflow management with drag-and-drop
+            {selectedProject && (
+              <span className="ml-2 text-sm">
+                • Showing <span className="font-medium text-blue-600 dark:text-blue-400">{selectedProject.title}</span> workstreams
+              </span>
+            )}
+          </p>
         </div>
-        <button 
-          onClick={() => setShowCreateForm(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
-        >
-          <icons.add className="w-5 h-5" />
-          <span>New Workstream</span>
-        </button>
+        <div className="flex items-center space-x-4">
+          {/* Project Filter Dropdown */}
+          <div className="flex items-center space-x-2">
+            <icons.filter className="w-5 h-5 text-gray-400" />
+            <select
+              value={selectedProjectId || ''}
+              onChange={(e) => setSelectedProjectId(e.target.value || null)}
+              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm min-w-[200px]"
+            >
+              <option value="">All Projects ({workstreams.length} workstreams)</option>
+              {projects.map(project => {
+                const projectWorkstreamCount = workstreams.filter(w => w.projectId === project.id).length;
+                return (
+                  <option key={project.id} value={project.id}>
+                    {project.title} ({projectWorkstreamCount} workstreams)
+                  </option>
+                );
+              })}
+            </select>
+          </div>
+          
+          <button 
+            onClick={() => setShowCreateForm(true)}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+          >
+            <icons.add className="w-5 h-5" />
+            <span>New Workstream</span>
+          </button>
+        </div>
       </div>
 
       {/* Create Workstream Form */}
@@ -210,7 +249,7 @@ const Workstreams: React.FC = () => {
                 onChange={(e) => setNewWorkstream({ ...newWorkstream, projectId: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               >
-                <option value="">Select a project</option>
+                <option value="">{selectedProjectId ? 'Select a project' : 'Select a project (or create standalone)'}</option>
                 {projects.map(project => (
                   <option key={project.id} value={project.id}>{project.title}</option>
                 ))}
@@ -246,7 +285,29 @@ const Workstreams: React.FC = () => {
       )}
 
       {/* Workstreams */}
-      {workstreams.length === 0 ? (
+      {filteredWorkstreams.length === 0 ? (
+        selectedProjectId ? (
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-12 text-center">
+            <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+              <icons.folder className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+              No workstreams in {selectedProject?.title}
+            </h3>
+            <p className="text-gray-600 dark:text-gray-300 mb-4">
+              This project doesn't have any workstreams yet. Create one to get started!
+            </p>
+            <button
+              onClick={() => {
+                setNewWorkstream({ ...newWorkstream, projectId: selectedProjectId });
+                setShowCreateForm(true);
+              }}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Create Workstream for {selectedProject?.title}
+            </button>
+          </div>
+        ) : (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-12 text-center">
           <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <icons.add className="w-8 h-8 text-gray-400" />
@@ -260,9 +321,10 @@ const Workstreams: React.FC = () => {
             Create Workstream
           </button>
         </div>
+        )
       ) : (
         <div className="space-y-6">
-          {workstreams.map((workstream, index) => (
+          {filteredWorkstreams.map((workstream, index) => (
             <div
               key={workstream.id}
               draggable
@@ -505,7 +567,7 @@ const Workstreams: React.FC = () => {
       {/* Edit Task Modal */}
       {editingTask && (
         <TaskEditModal
-          task={workstreams.flatMap(w => w.columns).flatMap(c => c.tasks).find(t => t.id === editingTask)!}
+          task={filteredWorkstreams.flatMap(w => w.columns).flatMap(c => c.tasks).find(t => t.id === editingTask)!}
           isOpen={!!editingTask}
           onClose={() => setEditingTask(null)}
           onSave={handleEditTask}
