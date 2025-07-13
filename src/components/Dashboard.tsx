@@ -189,34 +189,6 @@ const Dashboard: React.FC = () => {
             })}
           </div>
         </div>
-
-        {/* Recent Activity */}
-        <div className={`bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 ${starredTasks.length === 0 ? 'lg:col-span-2' : ''}`}>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Recent Activity</h3>
-          <div className="space-y-4">
-            {tasks.slice(0, 5).map((task) => {
-              const project = projects.find(p => p.id === task.listId);
-              return (
-                <div key={task.id} className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                  <div className={`w-2 h-2 rounded-full ${task.completed ? 'bg-green-500' : 'bg-yellow-500'}`}></div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">{task.title}</p>
-                    <p className="text-xs text-gray-600 dark:text-gray-400">{project?.title || 'Unknown Project'}</p>
-                  </div>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
-                    {task.completed ? 'Completed' : 'In Progress'}
-                  </span>
-                  <button
-                    onClick={() => setEditingTask(task.id)}
-                    className="text-gray-400 hover:text-blue-600 transition-colors"
-                  >
-                    <icons.edit className="w-3 h-3" />
-                  </button>
-                </div>
-              );
-            })}
-          </div>
-        </div>
       </div>
 
       {/* Edit Task Modal */}
