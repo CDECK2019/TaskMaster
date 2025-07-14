@@ -302,12 +302,6 @@ export const useWorkstreams = () => {
 
       // Also update the corresponding task in the main tasks table if it exists
       // We'll find it by matching title and other properties since we don't store the relationship
-      const workstreamTask = workstreams
-        .flatMap(w => w.columns)
-        .flatMap(c => c.tasks)
-        .find(t => t.id === taskId);
-
-      if (workstreamTask) {
         // Get the target column info to update the list association
         const { data: targetColumnData, error: columnError } = await supabase
           .from('workstream_columns')
@@ -321,7 +315,7 @@ export const useWorkstreams = () => {
           .eq('id', targetColumnId)
           .single();
 
-        if (!columnError && targetColumnData) {
+        if (!columnError && targetColumnData && workstreamTask) {
           const { data: { user } } = await supabase.auth.getUser();
           if (user) {
             const workstreamListTitle = `Workstream: ${targetColumnData.workstreams.title}`;
@@ -362,7 +356,6 @@ export const useWorkstreams = () => {
             }
           }
         }
-      }
 
       // Update local state
       setWorkstreams(prevWorkstreams => 
