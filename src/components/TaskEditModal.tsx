@@ -32,8 +32,10 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({
         title: task.title,
         description: task.description || '',
         priority: task.priority,
+        status: task.status || 'todo',
         dueDate: task.dueDate || '',
         listId: task.listId,
+        workstreamId: task.workstreamId || '',
         assignee: task.assignee || '',
         tags: task.tags || [],
         starred: task.starred || false
@@ -159,6 +161,24 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Status
+                </label>
+                <select
+                  value={editedTask.status || 'todo'}
+                  onChange={(e) => setEditedTask({ ...editedTask, status: e.target.value as 'todo' | 'in_progress' | 'review' | 'done' })}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                >
+                  <option value="todo">To Do</option>
+                  <option value="in_progress">In Progress</option>
+                  <option value="review">Review</option>
+                  <option value="done">Done</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Priority Task */}
+            <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Priority Task
                 </label>
                 <button
@@ -172,7 +192,6 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({
                   <icons.starred className={`w-5 h-5 ${editedTask.starred ? 'fill-current' : ''}`} />
                   <span>{editedTask.starred ? 'Priority Task' : 'Mark as Priority'}</span>
                 </button>
-              </div>
             </div>
 
             {/* Due Date and List */}

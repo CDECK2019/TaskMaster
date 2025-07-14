@@ -4,6 +4,7 @@ export interface Task {
   description?: string;
   completed: boolean;
   priority: 'low' | 'medium' | 'high';
+  status?: 'todo' | 'in_progress' | 'review' | 'done';
   dueDate?: string;
   createdAt: string;
   listId: string;

@@ -3,6 +3,7 @@ import { useTasks, useCreateTask, useUpdateTask, useDeleteTask, useToggleTask, u
 import { useLists } from '../hooks/useLists';
 import { useIconTheme } from '../contexts/IconThemeContext';
 import { formatDate, getPriorityColor } from '../utils/data';
+import { getStatusColor, getStatusLabel } from '../utils/data';
 import { ui } from '../styles/theme';
 import TaskEditModal from './TaskEditModal';
 import IconButton from './ui/IconButton';
@@ -26,8 +27,10 @@ const Tasks: React.FC = () => {
     title: '',
     description: '',
     priority: 'medium' as 'low' | 'medium' | 'high',
+    status: 'todo' as 'todo' | 'in_progress' | 'review' | 'done',
     dueDate: '',
     listId: '',
+    workstreamId: '',
     assignee: '',
     tags: [] as string[]
   });
@@ -71,14 +74,17 @@ const Tasks: React.FC = () => {
         await createTaskMutation.mutateAsync({
           ...newTask,
           completed: false,
+          workstreamId: newTask.workstreamId || undefined,
           dueDate: newTask.dueDate || undefined
         });
         setNewTask({
           title: '',
           description: '',
           priority: 'medium',
+          status: 'todo',
           dueDate: '',
           listId: '',
+          workstreamId: '',
           assignee: '',
           tags: []
         });
@@ -179,6 +185,19 @@ const Tasks: React.FC = () => {
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
                 <option value="high">High</option>
+              </select>
+            </div>
+            <div>
+              <label className={ui.label}>Status</label>
+              <select
+                value={newTask.status}
+                onChange={(e) => setNewTask({ ...newTask, status: e.target.value as 'todo' | 'in_progress' | 'review' | 'done' })}
+                className={ui.select}
+              >
+                <option value="todo">To Do</option>
+                <option value="in_progress">In Progress</option>
+                <option value="review">Review</option>
+                <option value="done">Done</option>
               </select>
             </div>
             <div>
@@ -303,6 +322,18 @@ const Tasks: React.FC = () => {
                           <div className="flex items-center space-x-2">
                             <div className={`w-3 h-3 rounded-full ${getListColor(task.listId)}`}></div>
                             <span className="text-sm text-gray-600 dark:text-gray-300">{getListName(task.listId)}</span>
+                          </div>
+                          
+                          <div className="flex items-center space-x-1">
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(task.status || 'todo')}`}>
+                              {getStatusLabel(task.status || 'todo')}
+                            </span>
+                          </div>
+                          
+                          <div className="flex items-center space-x-1">
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(task.status || 'todo')}`}>
+                              {getStatusLabel(task.status || 'todo')}
+                            </span>
                           </div>
                           
                           {task.dueDate && (

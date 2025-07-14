@@ -66,6 +66,7 @@ export interface Database {
           description: string | null;
           completed: boolean;
           priority: 'low' | 'medium' | 'high';
+          status: 'todo' | 'in_progress' | 'review' | 'done' | null;
           due_date: string | null;
           created_at: string;
           updated_at: string;
@@ -82,6 +83,7 @@ export interface Database {
           description?: string | null;
           completed?: boolean;
           priority: 'low' | 'medium' | 'high';
+          status?: 'todo' | 'in_progress' | 'review' | 'done' | null;
           due_date?: string | null;
           created_at?: string;
           updated_at?: string;
@@ -98,6 +100,7 @@ export interface Database {
           description?: string | null;
           completed?: boolean;
           priority?: 'low' | 'medium' | 'high';
+          status?: 'todo' | 'in_progress' | 'review' | 'done' | null;
           due_date?: string | null;
           created_at?: string;
           updated_at?: string;

@@ -185,3 +185,32 @@ export const getProgressPercentage = (completed: number, total: number) => {
   if (total === 0) return 0;
   return Math.round((completed / total) * 100);
 };
+export const getStatusColor = (status: string) => {
+  switch (status) {
+    case 'todo':
+      return 'text-gray-600 bg-gray-100 dark:bg-gray-700 dark:text-gray-300';
+    case 'in_progress':
+      return 'text-blue-600 bg-blue-100 dark:bg-blue-900/30 dark:text-blue-300';
+    case 'review':
+      return 'text-yellow-600 bg-yellow-100 dark:bg-yellow-900/30 dark:text-yellow-300';
+    case 'done':
+      return 'text-green-600 bg-green-100 dark:bg-green-900/30 dark:text-green-300';
+    default:
+      return 'text-gray-600 bg-gray-100 dark:bg-gray-700 dark:text-gray-300';
+  }
+};
+
+export const getStatusLabel = (status: string) => {
+  switch (status) {
+    case 'todo':
+      return 'To Do';
+    case 'in_progress':
+      return 'In Progress';
+    case 'review':
+      return 'Review';
+    case 'done':
+      return 'Done';
+    default:
+      return 'To Do';
+  }
+};

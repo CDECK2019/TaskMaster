@@ -253,6 +253,25 @@ export const useWorkstreams = () => {
 
   const moveTask = async (taskId: string, sourceColumnId: string, targetColumnId: string, workstreamId: string) => {
     try {
+      // Get the target column title to determine the status
+      const { data: targetColumnData, error: columnError } = await supabase
+        .from('workstream_columns')
+        .select('title')
+        .eq('id', targetColumnId)
+        .single();
+
+      if (columnError) throw columnError;
+
+      // Map column titles to status values
+      const statusMap: Record<string, string> = {
+        'To Do': 'todo',
+        'In Progress': 'in_progress',
+        'Review': 'review',
+        'Done': 'done'
+      };
+
+      const newStatus = statusMap[targetColumnData.title] || 'todo';
+
       // Update task's column_id in workstream_tasks database
       const { error } = await supabase
         .from('workstream_tasks')
@@ -260,6 +279,26 @@ export const useWorkstreams = () => {
         .eq('id', taskId);
 
       if (error) throw error;
+
+      // Update the corresponding task in the main tasks table with new status
+      const workstreamTask = workstreams
+        .flatMap(w => w.columns)
+        .flatMap(c => c.tasks)
+        .find(t => t.id === taskId);
+
+      if (workstreamTask) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          await supabase
+            .from('tasks')
+            .update({ 
+              status: newStatus,
+              completed: newStatus === 'done'
+            })
+            .eq('title', workstreamTask.title)
+            .eq('user_id', user.id);
+        }
+      }
 
       // Also update the corresponding task in the main tasks table if it exists
       // We'll find it by matching title and other properties since we don't store the relationship
