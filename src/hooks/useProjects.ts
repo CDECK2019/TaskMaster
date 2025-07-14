@@ -89,10 +89,11 @@ export const useProjects = () => {
 
       // Create default columns for the workstream
       const defaultColumns = [
-        { title: 'To Do', color: 'bg-gray-100', position: 0 },
-        { title: 'In Progress', color: 'bg-blue-100', position: 1 },
-        { title: 'Review', color: 'bg-yellow-100', position: 2 },
-        { title: 'Done', color: 'bg-green-100', position: 3 }
+        { title: 'Key Decisions', color: 'bg-purple-100', position: 0 },
+        { title: 'To Do', color: 'bg-gray-100', position: 1 },
+        { title: 'In Progress', color: 'bg-blue-100', position: 2 },
+        { title: 'Review', color: 'bg-yellow-100', position: 3 },
+        { title: 'Done', color: 'bg-green-100', position: 4 }
       ];
 
       await supabase
@@ -209,10 +210,11 @@ export const useProjects = () => {
 
       // Create default columns for the workstream
       const defaultColumns = [
-        { title: 'To Do', color: 'bg-gray-100', position: 0 },
-        { title: 'In Progress', color: 'bg-blue-100', position: 1 },
-        { title: 'Review', color: 'bg-yellow-100', position: 2 },
-        { title: 'Done', color: 'bg-green-100', position: 3 }
+        { title: 'Key Decisions', color: 'bg-purple-100', position: 0 },
+        { title: 'To Do', color: 'bg-gray-100', position: 1 },
+        { title: 'In Progress', color: 'bg-blue-100', position: 2 },
+        { title: 'Review', color: 'bg-yellow-100', position: 3 },
+        { title: 'Done', color: 'bg-green-100', position: 4 }
       ];
 
       await supabase
