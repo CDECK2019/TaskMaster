@@ -303,7 +303,7 @@ export const useWorkstreams = () => {
       // Also update the corresponding task in the main tasks table if it exists
       // We'll find it by matching title and other properties since we don't store the relationship
         // Get the target column info to update the list association
-        const { data: targetColumnData, error: columnError } = await supabase
+        const { data: targetColumnInfo, error: targetColumnInfoError } = await supabase
           .from('workstream_columns')
           .select(`
             *,
@@ -315,10 +315,10 @@ export const useWorkstreams = () => {
           .eq('id', targetColumnId)
           .single();
 
-        if (!columnError && targetColumnData && workstreamTask) {
+        if (!targetColumnInfoError && targetColumnInfo && workstreamTask) {
           const { data: { user } } = await supabase.auth.getUser();
           if (user) {
-            const workstreamListTitle = `Workstream: ${targetColumnData.workstreams.title}`;
+            const workstreamListTitle = `Workstream: ${targetColumnInfo.workstreams.title}`;
             
             // Find or create the target list
             let targetListId: string;
@@ -336,7 +336,7 @@ export const useWorkstreams = () => {
                 .from('lists')
                 .insert({
                   title: workstreamListTitle,
-                  description: `Tasks from ${targetColumnData.workstreams.title} workstream`,
+                  description: `Tasks from ${targetColumnInfo.workstreams.title} workstream`,
                   color: 'bg-indigo-500',
                   user_id: user.id
                 })
