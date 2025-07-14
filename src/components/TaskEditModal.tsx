@@ -46,14 +46,14 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({
   const handleSave = async () => {
     if (!editedTask.title?.trim()) return;
     
-    setSaving(true);
+    setLoading(true);
     try {
       await onSave(task.id, editedTask);
       onClose();
     } catch (error) {
       // Error handled in parent component
     } finally {
-      setSaving(false);
+      setLoading(false);
     }
   };
 
@@ -61,14 +61,14 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({
     if (!onDelete) return;
     
     if (window.confirm('Are you sure you want to delete this task?')) {
-      setSaving(true);
+      setLoading(true);
       try {
         await onDelete(task.id);
         onClose();
       } catch (error) {
         // Error handled in parent component
       } finally {
-        setSaving(false);
+        setLoading(false);
       }
     }
   };

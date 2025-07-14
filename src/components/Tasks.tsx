@@ -9,12 +9,7 @@ import TaskEditModal from './TaskEditModal';
 import IconButton from './ui/IconButton';
 
 const Tasks: React.FC = () => {
-  const { data: tasks = [], isLoading, error } = useTasks();
-  const createTaskMutation = useCreateTask();
-  const updateTaskMutation = useUpdateTask();
-  const deleteTaskMutation = useDeleteTask();
-  const toggleTask = useToggleTask();
-  const toggleStarred = useToggleStarred();
+  const { tasks, loading, createTask, updateTask, deleteTask, toggleTask, toggleStarred } = useTasks();
   const { lists } = useLists();
   const { icons } = useIconTheme();
   const [searchTerm, setSearchTerm] = useState('');
@@ -71,7 +66,7 @@ const Tasks: React.FC = () => {
   const handleCreateTask = async () => {
     if (newTask.title.trim() && newTask.listId) {
       try {
-        await createTaskMutation.mutateAsync({
+        await createTask({
           ...newTask,
           completed: false,
           workstreamId: newTask.workstreamId || undefined,
@@ -90,22 +85,14 @@ const Tasks: React.FC = () => {
         });
         setShowCreateForm(false);
       } catch (error) {
-        // Error handled by mutation
+        // Error handled in hook
       }
     }
   };
 
   const editingTaskData = editingTask ? tasks.find(t => t.id === editingTask) : null;
 
-  if (error) {
-    return (
-      <div className="text-center py-12 text-red-600 dark:text-red-400">
-        Error loading tasks: {error.message}
-      </div>
-    );
-  }
-
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className={ui.spinner} />
@@ -219,9 +206,9 @@ const Tasks: React.FC = () => {
               <button
                 onClick={handleCreateTask}
                 className={ui.button.primary}
-                disabled={createTaskMutation.isPending}
+                disabled={loading}
               >
-                {createTaskMutation.isPending ? 'Creating...' : 'Create Task'}
+                {loading ? 'Creating...' : 'Create Task'}
               </button>
             </div>
           </div>
@@ -322,12 +309,6 @@ const Tasks: React.FC = () => {
                           <div className="flex items-center space-x-2">
                             <div className={`w-3 h-3 rounded-full ${getListColor(task.listId)}`}></div>
                             <span className="text-sm text-gray-600 dark:text-gray-300">{getListName(task.listId)}</span>
-                          </div>
-                          
-                          <div className="flex items-center space-x-1">
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(task.status || 'todo')}`}>
-                              {getStatusLabel(task.status || 'todo')}
-                            </span>
                           </div>
                           
                           <div className="flex items-center space-x-1">
@@ -472,8 +453,8 @@ const Tasks: React.FC = () => {
           task={editingTaskData}
           isOpen={!!editingTask}
           onClose={() => setEditingTask(null)}
-          onSave={(taskId, updates) => updateTaskMutation.mutate({ id: taskId, updates })}
-          onDelete={(taskId) => deleteTaskMutation.mutate(taskId)}
+          onSave={handleEditTask}
+          onDelete={handleDeleteTask}
         />
       )}
     </div>
